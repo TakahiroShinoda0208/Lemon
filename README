@@ -5,6 +5,10 @@
  Author: Takahiro Shinoda
  Date: 2019/02/29
 
+ ---- 使用コマンド ----
+      
+      ./lemon.sh
+
  ---- 概要 ----
 　　
  annotation pipeline遺伝子予測統合プロトコル Lemon は以下の5プログラムで構成されています。
