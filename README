@@ -1,0 +1,111 @@
+ Itoh-lab annotation pipeline ver1.0 protocol
+ 
+ Version: 1.0.0
+
+ Author: Takahiro Shinoda
+ Date: 2019/02/29
+
+ ---- 概要 ----
+　　
+ annotation pipeline遺伝子予測統合プロトコル Lemon は以下の5プログラムで構成されています。
+    
+    0. phase0.sh
+        RNA-seq-based、Ab initio-based、Homology-based 各手法で予測された遺伝子データのクリーニングを行う。
+	具体的には、各プロトコルごとのgffファイル表記ずれを修正する。
+    
+    1. phase1.sh
+        phase0で予測した遺伝子構造から、動的計画法を用いて最大スコアを有する遺伝子構造を探索する。
+    
+    2. phase2.sh
+        phase0で予測した遺伝子構造から、Single-exon geneを予測する。
+	phase1で予測された遺伝子とエクソン領域がかぶらない遺伝子のみ追加する。
+    
+    3. phase3.sh
+        phase0で予測された遺伝子の中から、予測精度の高い遺伝子のみを抽出する。
+	phase1、2で予測された遺伝子と被らない遺伝子のみ追加する。
+
+    4. phase4.sh
+        phase0で予測された遺伝子の中から、部分的に予測精度の高い遺伝子のみを抽出する。
+	phase1、2、3で予測された遺伝子と被らない遺伝子のみ追加する。
+
+    5. phase5.sh
+        ORFの情報を修正して、フォーマットを整えるツール
+
+
+ ---- 使用ツール ----
+     各プログラム内部で以下のツールが動いています。
+
+    全般
+        - 181109_gff_editor
+		Gffを成形するツール
+	- Geneadd_v2
+		遺伝子を追加するツール
+
+    0. phase0.sh
+        - Spaln_reform
+		Spalnの出力結果を修正するツール
+        - Augustus_reform
+		Augustusの結果を修正するツール
+        - RNA-seq_reform
+		RNA-seq-basedの結果を修正するツール
+	- ORFframefix
+		Open Reading Frameを修正するツール
+	- Row2_rename
+		2列目の情報を書き換えるツール
+
+    1. phase1.sh
+        - Group_181130
+		ゲノム配列上の同じ領域に予測されている遺伝子を1グループとする
+		重み付けを用いて、計算に必要ないグループを削除する
+        - Searchalgo_181105(**メインツール**)
+	  	動的計画法で遺伝子構造を予測するツール
+
+    2. phase2.sh
+        - Group_181015
+		ゲノム配列上の同じ領域に予測されている遺伝子を1グループとするツール
+        - Singleexon_181031
+		Single exon geneを予測するツール
+
+    3. phase3.sh
+
+    4. phase4.sh
+        - Completion_181112
+		ゲノム領域上で8割以上のexonが他のツールで支持されている遺伝子を予測するツール
+
+    5. phase5.sh
+        - ORFframefix
+		Open Reading Frameを修正するツール
+        - Polish_181207
+		ゲノム領域上で8割以上のexonが他のツールで支持されている遺伝子を予測するツール
+
+     全てのツールはscriptsディレクトリ内に格納されています。
+
+ ---- 使用方法 ----
+    
+    0. 全般
+        - lemon.shはPASHを通してください
+        - 自作ツールのソースコードは./src/にあります。
+
+    0. Lemon.sh
+        - Lemonには以下のパスが必要です。事前に設定してください。
+	  T:		thread数(phase1の動的計画法時に並列処理を行います。)
+	  genome: 	genome配列
+	  weight:	phase1で使用する動的計画法の重み付けファイルです
+	  		(mappingbase、denovobase、AUGUSTUS、SNAP、homology)
+	  mapping:	mappingbasedの予測遺伝子データ
+	  denovo:	denovobasedの予測遺伝子データ
+	  augustus:	Augustusの予測遺伝子データ
+	  snap:		SNAPの予測遺伝子データ
+	  homology:	Homologyの予測遺伝子データ
+	  mapp_high:	mappingbasedの高精度予測遺伝子データ
+	  augu_high:	Augustusの高精度予測遺伝子データ
+	  homo_high:	homologyの高精度予測遺伝子データ
+k
+        - 以下のファイルが生成されます。
+          ./data/	phase0で加工したデータがここに出力されます
+	  ./lemon/	統合プロトコルの各フェーズで出力されたgffデータがここに入っています
+	   		(phase1.gff,phase2.gff,phase3.gff,phase4.gff,phase5.gff)
+
+ ----- Version更新履歴 -----
+    v1.0.0 (2019/03/01)
+        - lemonのプロトコルを作成しました。

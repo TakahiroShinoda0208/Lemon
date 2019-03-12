@@ -1,0 +1,5 @@
+mappingbase	2
+denovobase	1
+AUGUSTUS	2
+SNAP	1
+homology	2

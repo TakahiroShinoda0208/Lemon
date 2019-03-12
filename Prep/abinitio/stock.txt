@@ -1,0 +1,24 @@
+[2018/11/06 湯淺記述]
+現在、使っているab initioのshellスクリプトは下記にあります。
+・Augustus
+/data/yuasa/script/abinitio/Augustus_DS.sh
+・SNAP
+/data/yuasa/script/abinitio/snap_DS_ver2.sh
+(スクラッチ以下に中間ファイルを出力するタイプはstockの2018/12/06の記事を参照)
+
+・Augustusでの注意点
+①Augusutusは各自インストールお願いします。
+②optimizeの並列化にはperlモジュールのParallel::ForkManagerが必要なのでインストールお願いします。
+③gffのCDSにstopコドンを含めているか否かでフィルタリングが変わります。途中に生成されるtrain.errを確認して異常にerrが多ければ、etrainingの"--stopCodonExcludedFromCDS="のオプションをTrueにしてみてください。
+④gffとfastaの配列名が一致しないと正しく動きません。
+⑤内部でPython2系で書いたスクリプトを使用しています。(3系だと動かないそうです。)
+
+・SNAPでの注意点
+①SNAPではAugustusでダウンサンプリングした学習セットと全く同じものを使うようにしている関係で、以下にご注意お願いします。
+
+    ・Augustusを先に実行してsecond.gb.train.trainのファイルが生成されてからSNAPを実行してください
+
+    ・二つのshellは同じディレクトリにコピーして実行してください。
+③gffとfastaの配列名が一致しないと正しく動きません。
+④一部、高橋くんと中村さんの環境に依存する部分があります。
+⑤内部でPython2系で書いたスクリプトを使用しています。
