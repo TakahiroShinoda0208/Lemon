@@ -110,9 +110,9 @@ fi
 
 ### -----phase5-----
 if ( test $1 -ge 5 && test $1 -lt 6 ) || test $1 -eq 11; then
-echo "start phase4-----------------------------"
+echo "start phase5-----------------------------"
 $phase5 phase4.gff
-echo "finish phase4-----------------------------"
+echo "finish phase5-----------------------------"
 fi
 
 ### ----delete不必要なデータ----
