@@ -45,9 +45,10 @@ do
 done
 
 #jobが完了したか確認
-while [ `ps aux|grep "takahiro"|grep "Searchalgo"|wc -l` -gt 1 ]
+usrname=`whoami`
+while [ `ps aux|grep $usrname|grep "Searchalgo"|wc -l` -gt 1 ]
 do
-    echo `ps aux|grep "takahiro"|grep "Searchalgo"|wc -l`
+    echo `ps aux|grep $usrname|grep "Searchalgo"|wc -l`
     sleep 10s
 done
     	    
