@@ -7,9 +7,7 @@ dict="Abinitio_predict" #Augustus_prediction以下にできる作業ディレク
 genome= #ゲノム配列
 gff= #学習セット(配列の名前はfastaと対応している必要あり)
 size=`echo 1000` #学習セットのサイズ
-s_number=16 #FASTAファイルを分割する数
-optimize_num=16 #optimize時のthread数
-nice_value=0 #nice値(0-19)
+thread=16 #最大配列数
 ###-------------------
 ###----事前環境-------
 ROOT=$(dirname `which $0`)
@@ -66,7 +64,7 @@ augustus --species=$spec second.gb.test | tee firsttest.out
 grep -A 22 Evaluation firsttest.out > test_result1.txt &
 	
 #最適化
-nice -n $nice_value optimize_augustus.pl --species=$spec second.gb.train.train --cpus=${optimize_num} --kfold=${optimize_num}
+optimize_augustus.pl --species=$spec second.gb.train.train --cpus=${thread} --kfold=${thread}
 	
 #training2
 etraining --species=$spec second.gb.train.train
@@ -76,27 +74,27 @@ augustus --species=$spec second.gb.test | tee second.out
 grep -A 22 Evaluation second.out > test_result2.txt &
 	
 #fastaファイルの分割
-python ${script}/pre_assembly_first_step.py $genome $s_number
+python ${script}/pre_assembly_first_step.py $genome $thread
 sort -nrk 1 -t "@" list.tMp > list_sort.tMp
 wait
-python ${script}/distribute_second_step.py list_sort.tMp $s_number
+python ${script}/distribute_second_step.py list_sort.tMp $thread
 
-for y in $(seq 1 $s_number)
+for y in $(seq 1 $thread)
 do
 	python ${script}/tab_separate_third_step.py sPlitfile${y}.tMp > sPlitfile${y}.fasta &
 done
 wait
 
 #分割したfastaファイルで予測
-for k in $(seq 1 $s_number)
+for k in $(seq 1 $thread)
 do
-        nice -n $nice_value  augustus --species=${spec} sPlitfile${k}.fasta  > abinitio${k}.gff &
+        augustus --species=${spec} sPlitfile${k}.fasta  > abinitio${k}.gff &
 done
 
 wait
 
 #分割して予測したファイルを統合
-for l in $(seq 1 $s_number)
+for l in $(seq 1 $thread)
 do
         grep -v "#" abinitio${l}.gff > abinitio${l}_shaped.gff &
 done
